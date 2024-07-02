@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
@@ -16,7 +17,7 @@ class UserController extends Controller
     {
         //
         try {
-            $users = User::get();
+            $users = User::orderByRaw('role = "admin" DESC')->get();
             $roles = Role::get();
             return response()->json([
                 'users' => $users,
@@ -100,7 +101,8 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => $request->password,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
             ]);
 
             return response()->json([

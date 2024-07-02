@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Dish;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 
 class DishController extends Controller
 {
@@ -114,6 +115,14 @@ class DishController extends Controller
     {
         //
         $dish = Dish::where('id', $id)->firstOrFail();
+
+        if ($file = $request->file('image')) {
+            $file_name = uniqid() . ($file->getClientOriginalName());
+            $file->move(public_path('/images'), $file_name);
+            File::delete(public_path('/images'), $dish->image);
+        } else {
+            $file_name = $dish->image;
+        }
 
         $dish->update($request->all());
         return response()->json([

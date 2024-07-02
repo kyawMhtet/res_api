@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DishController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\Panel\CartController;
 use App\Http\Controllers\Api\Panel\MenuController;
 use App\Http\Controllers\UserController;
 use App\Models\Dish;
@@ -51,9 +53,22 @@ Route::group(['middleware' => 'auth:sanctum', 'role:admin'], function () {
 });
 
 
+// order
+Route::group(['prefix' => 'orders', 'middleware' => 'auth:sanctum', 'role:admin'], function () {
+    Route::get('/', [OrderController::class, 'index']);
+    Route::post('/change-status', [OrderController::class, 'changeStatus']);
+});
+
+
 // panel
 
-Route::group(['prefix' => 'panel'], function () {
+Route::group(['prefix' => 'panel', 'middleware' => 'auth:sanctum', 'role:waiter'], function () {
     Route::get('/categories', [MenuController::class, 'index'])->name('categories#index');
     Route::get('/categories/menus/{id}', [MenuController::class, 'menus'])->name('categories#menus');
+    Route::post('/categories/menus/{id}', [CartController::class, 'addToCart'])->name('add#cart');
+    Route::post('/auth/logout', [AuthController::class, 'staffLogout'])->name('staff#logout');
+    Route::get('/cartInfo', [CartController::class, 'index'])->name('cart#index');
+    Route::post('/cartInfo/add-qty', [CartController::class, 'addQty']);
+    Route::post('/cartInfo/sub-qty', [CartController::class, 'subQty']);
+    Route::post('/cartInfo/check-out', [CartController::class, 'checkout']);
 });

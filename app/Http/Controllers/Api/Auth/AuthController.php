@@ -106,4 +106,21 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+
+    public function staffLogout(Request $request)
+    {
+        try {
+            $request->user()->tokens()->delete();
+
+            return response()->json([
+                'message' => 'Logged out successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
